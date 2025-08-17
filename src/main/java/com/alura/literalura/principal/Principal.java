@@ -1,8 +1,7 @@
 package com.alura.literalura.principal;
 
-import com.alura.literalura.model.Autor;
-import com.alura.literalura.model.DadosLivro;
-import com.alura.literalura.model.ResultadoApi;
+import com.alura.literalura.model.*;
+import com.alura.literalura.repository.LivroRepository;
 import com.alura.literalura.service.ConsumoApi;
 import com.alura.literalura.service.ConverteDados;
 
@@ -13,6 +12,12 @@ public class Principal {
     private ConsumoApi consumoApi = new ConsumoApi();
     private final String ENDERECO = "http://gutendex.com/books/?search=";
     private ConverteDados converteDados = new ConverteDados();
+
+    LivroRepository repository;
+
+    public Principal(LivroRepository repository) {
+        this.repository = repository;
+    }
 
     public void exibeMenu() {
         var opcao = -1;
@@ -60,13 +65,36 @@ public class Principal {
                     .orElse("Desconhecido"));
 
             String idiomas = livro.idiomas()
-                            .stream()
-                                    .reduce((a,b) -> a + ", " + b)
-                                            .orElse("Desconhecido");
+                    .stream()
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Desconhecido");
 
             System.out.println("Idioma: " + idiomas);
             System.out.println("Número de downloads: " + livro.downloads());
             System.out.println("----------------------");
+
+            LivroEntity livroEntidade = new LivroEntity();
+            livroEntidade.setTitulo(livro.titulo());
+            livroEntidade.setDownloads(livro.downloads());
+            String resumoTexto = String.join("\n", livro.resumos());
+            livroEntidade.setResumos(resumoTexto);
+            String idiomasTexto = String.join(", ", livro.idiomas());
+            livroEntidade.setIdiomas(idiomasTexto);
+
+            for (Autor autor : livro.autores()) {
+                AutorEntity autorEntidade = new AutorEntity();
+                autorEntidade.setNome(autor.nome());
+                autorEntidade.setAnoNascimento(autor.anoNascimento());
+                autorEntidade.setAnoMorte(autor.anoMorte());
+
+                LivroAutorEntity livroAutorEntidade = new LivroAutorEntity();
+                livroAutorEntidade.setLivro(livroEntidade);
+                livroAutorEntidade.setAutor(autorEntidade);
+
+                livroEntidade.getAutores().add(livroAutorEntidade);
+            }
+
+            repository.save(livroEntidade);
         }
     }
 }

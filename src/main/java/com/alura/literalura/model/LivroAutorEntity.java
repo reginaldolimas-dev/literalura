@@ -14,7 +14,7 @@ public class LivroAutorEntity {
     @JoinColumn(name = "livro_id", nullable = false)
     private LivroEntity livro;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "autor_id", nullable = false)
     private AutorEntity autor;
 

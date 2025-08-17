@@ -14,15 +14,24 @@ public class LivroEntity {
     private String titulo;
     @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LivroAutorEntity> autores = new ArrayList<>();
-    private List<String> resumos;
+    @Column(columnDefinition = "TEXT")
+    private String resumos;
     private List<String> assuntos;
     private List<String> estantes;
-    private List<String> idiomas;
+    private String idiomas;
     private String tipoMidia;
     private int downloads;
 
     public Long getId() {
         return id;
+    }
+
+    public String getResumos() {
+        return resumos;
+    }
+
+    public void setResumos(String resumos) {
+        this.resumos = resumos;
     }
 
     public void setId(Long id) {
@@ -45,14 +54,6 @@ public class LivroEntity {
         this.autores = autores;
     }
 
-    public List<String> getResumos() {
-        return resumos;
-    }
-
-    public void setResumos(List<String> resumos) {
-        this.resumos = resumos;
-    }
-
     public List<String> getAssuntos() {
         return assuntos;
     }
@@ -69,11 +70,11 @@ public class LivroEntity {
         this.estantes = estantes;
     }
 
-    public List<String> getIdiomas() {
+    public String getIdiomas() {
         return idiomas;
     }
 
-    public void setIdiomas(List<String> idiomas) {
+    public void setIdiomas(String idiomas) {
         this.idiomas = idiomas;
     }
 
