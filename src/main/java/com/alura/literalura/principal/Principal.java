@@ -54,6 +54,9 @@ public class Principal {
                 case 4:
                     listarAutoresVivosPorAno();
                     break;
+                case 5:
+                    listarLivrosEmDeterminadoIdioma();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -164,4 +167,34 @@ public class Principal {
                     .collect(Collectors.joining(", ")));
         });
     }
+
+    private void listarLivrosEmDeterminadoIdioma() {
+        System.out.println("Insira o idioma que deseja consultar");
+        System.out.println("""
+                es - Espanhol
+                en - Inglês
+                fr - Francês
+                pt - Português
+                """);
+        var idioma = leitura.nextLine();
+
+        List<LivroEntity> livrosEncontrados = livroRepository.findByIdiomasContaining(idioma);
+        livrosEncontrados.forEach(livro -> {
+            System.out.println("------ LIVRO -------");
+
+            System.out.println("Título: " + livro.getTitulo());
+            System.out.println("Autor: " + livro.getAutores()
+                    .stream()
+                    .map(e -> e.getAutor().getNome())
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Desconhecido"));
+
+            System.out.println("Idioma: " + livro.getIdiomas());
+            System.out.println("Número de downloads: " + livro.getDownloads());
+            System.out.println("----------------------");
+
+        });
+
+    }
+
 }
