@@ -1,11 +1,14 @@
 package com.alura.literalura.principal;
 
 import com.alura.literalura.model.*;
+import com.alura.literalura.repository.AutorRepository;
 import com.alura.literalura.repository.LivroRepository;
 import com.alura.literalura.service.ConsumoApi;
 import com.alura.literalura.service.ConverteDados;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -13,10 +16,12 @@ public class Principal {
     private final String ENDERECO = "http://gutendex.com/books/?search=";
     private ConverteDados converteDados = new ConverteDados();
 
-    LivroRepository repository;
+    LivroRepository livroRepository;
+    AutorRepository autorRepository;
 
-    public Principal(LivroRepository repository) {
-        this.repository = repository;
+    public Principal(LivroRepository livroRepository, AutorRepository autorRepository) {
+        this.livroRepository = livroRepository;
+        this.autorRepository = autorRepository;
     }
 
     public void exibeMenu() {
@@ -39,6 +44,15 @@ public class Principal {
             switch (opcao) {
                 case 1:
                     buscaLivroPorTitulo();
+                    break;
+                case 2:
+                    listarLivros();
+                    break;
+                case 3:
+                    listarAutores();
+                    break;
+                case 4:
+                    listarAutoresVivosPorAno();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -94,7 +108,60 @@ public class Principal {
                 livroEntidade.getAutores().add(livroAutorEntidade);
             }
 
-            repository.save(livroEntidade);
+            livroRepository.save(livroEntidade);
         }
+    }
+
+    private void listarLivros() {
+        List<LivroEntity> livrosEncontrados = livroRepository.findAll();
+
+        livrosEncontrados.forEach(livro -> {
+            System.out.println("------ LIVRO -------");
+
+            System.out.println("Título: " + livro.getTitulo());
+            System.out.println("Autor: " + livro.getAutores()
+                    .stream()
+                    .map(e -> e.getAutor().getNome())
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Desconhecido"));
+
+            System.out.println("Idioma: " + livro.getIdiomas());
+            System.out.println("Número de downloads: " + livro.getDownloads());
+            System.out.println("----------------------");
+
+        });
+
+    }
+
+    private void listarAutores() {
+        List<AutorEntity> autoresEncontrados = autorRepository.findAll();
+        autoresEncontrados.forEach(autor -> {
+            System.out.println("------ AUTOR -------");
+            System.out.println("Nome: " + autor.getNome());
+            System.out.println("Nascimento: " + autor.getAnoNascimento());
+            System.out.println("Morte: " + autor.getAnoMorte());
+            System.out.println("Livros: " + autor.getLivros().stream()
+                    .map(e -> e.getLivro().getTitulo())
+                    .collect(Collectors.joining(", ")));
+            System.out.println("----------------------");
+        });
+    }
+
+    private void listarAutoresVivosPorAno() {
+        System.out.println("Insira o ano que deseja consultar");
+        var ano = leitura.nextInt();
+        leitura.nextLine();
+
+        List<AutorEntity> autoresEncontrados = autorRepository.findAutoresVivosNoAno(ano);
+
+        autoresEncontrados.forEach(autor -> {
+            System.out.println("------ AUTOR -------");
+            System.out.println("Nome: " + autor.getNome());
+            System.out.println("Nascimento: " + autor.getAnoNascimento());
+            System.out.println("Morte: " + autor.getAnoMorte());
+            System.out.println("Livros: " + autor.getLivros().stream()
+                    .map(e -> e.getLivro().getTitulo())
+                    .collect(Collectors.joining(", ")));
+        });
     }
 }

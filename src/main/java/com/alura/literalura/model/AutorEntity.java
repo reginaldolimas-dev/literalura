@@ -14,7 +14,7 @@ public class AutorEntity {
     private String nome;
     private Integer anoNascimento;
     private Integer anoMorte;
-    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<LivroAutorEntity> livros = new ArrayList<>();
 
     public Long getId() {

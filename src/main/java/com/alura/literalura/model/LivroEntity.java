@@ -12,7 +12,8 @@ public class LivroEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String titulo;
-    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<LivroAutorEntity> autores = new ArrayList<>();
     @Column(columnDefinition = "TEXT")
     private String resumos;
@@ -92,5 +93,12 @@ public class LivroEntity {
 
     public void setDownloads(int downloads) {
         this.downloads = downloads;
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + id +
+                ", titulo='" + titulo + '\'' +
+                ", idiomas='" + idiomas;
     }
 }
