@@ -1,9 +1,18 @@
 package com.alura.literalura.principal;
 
+import com.alura.literalura.model.Autor;
+import com.alura.literalura.model.DadosLivro;
+import com.alura.literalura.model.ResultadoApi;
+import com.alura.literalura.service.ConsumoApi;
+import com.alura.literalura.service.ConverteDados;
+
 import java.util.Scanner;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
+    private ConsumoApi consumoApi = new ConsumoApi();
+    private final String ENDERECO = "http://gutendex.com/books/?search=";
+    private ConverteDados converteDados = new ConverteDados();
 
     public void exibeMenu() {
         var opcao = -1;
@@ -24,7 +33,7 @@ public class Principal {
 
             switch (opcao) {
                 case 1:
-                    System.out.println("Heloo world");;
+                    buscaLivroPorTitulo();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -32,6 +41,32 @@ public class Principal {
                 default:
                     System.out.println("Opção inválida");
             }
+        }
+    }
+
+    private void buscaLivroPorTitulo() {
+        System.out.println("Digite o título do livro para busca");
+        var nomeSerie = leitura.nextLine();
+        var json = consumoApi.obterDados(ENDERECO + nomeSerie.replace(" ", "+"));
+        ResultadoApi resultado = converteDados.obterDados(json, ResultadoApi.class);
+
+        for (DadosLivro livro : resultado.results()) {
+            System.out.println("------ LIVRO -------");
+            System.out.println("Título: " + livro.titulo());
+            System.out.println("Autor: " + livro.autores()
+                    .stream()
+                    .map(Autor::nome)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("Desconhecido"));
+
+            String idiomas = livro.idiomas()
+                            .stream()
+                                    .reduce((a,b) -> a + ", " + b)
+                                            .orElse("Desconhecido");
+
+            System.out.println("Idioma: " + idiomas);
+            System.out.println("Número de downloads: " + livro.downloads());
+            System.out.println("----------------------");
         }
     }
 }
